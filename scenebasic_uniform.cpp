@@ -12,98 +12,225 @@ using std::endl;
 
 #include "helper/glutils.h"
 
+#include "helper/glslprogram.h"
+
+#include <glm/ext/matrix_transform.hpp>
+
+//#include "torus.h"
+#include <glm/glm.hpp>
+
+#include <glm/ext/matrix_clip_space.hpp>
+
 using glm::vec3;
 
-SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f) {}
+//lab 3
+#include <sstream>
+#include <GLFW/glfw3.h>
+
+//lab 4
+#include "helper/texture.h"
+
+//SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 30.f, 30.f) {}
+//SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 10.f, 100.f) {} //view with cell shading
+
+//SceneBasic_Uniform::SceneBasic_Uniform() : teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))) {}
+
+//SceneBasic_Uniform::SceneBasic_Uniform() : teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))), angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f) {}
+
+//SceneBasic_Uniform::SceneBasic_Uniform() : plane(50.f, 50.f, 1, 1), angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f)
+SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f) {
+    grassPlane = ObjMesh::load("media/grassPlane/scene.gltf", true);
+}
+
+//SceneBasic_Uniform::SceneBasic_Uniform() : timePrev(0.f), teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))) {}
+
+//SceneBasic_Uniform::SceneBasic_Uniform() : timePrev(0.f), plane(50.f, 50.f, 1, 1) {}
+
+/*SceneBasic_Uniform::SceneBasic_Uniform() : teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f)))
+{
+    teapotMesh = ObjMesh::load("../Project_Template/media/pig_triangulated.obj", true);
+}*/
+
+//glm::mat4 rotationMatrix;
 
 void SceneBasic_Uniform::initScene()
 {
     compile();
 
-    std::cout << std::endl;
+    glEnable(GL_DEPTH_TEST);
 
-    prog.printActiveUniforms();
+    model = glm::mat4(1.0f);
+    //model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
+    projection = glm::mat4(1.0f);
 
-    /////////////////// Create the VBO ////////////////////
-    float positionData[] = {
-        -0.8f, -0.8f, 0.0f,
-         0.8f, -0.8f, 0.0f,
-         0.0f,  0.8f, 0.0f };
-    float colorData[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f };
+    //projector matrix
+    vec3 projPos = vec3(2.0f, 5.0f, 5.0f);
+    vec3 projAt = vec3(-2.0f, -4.0f, 0.0f);
+    vec3 projUp = vec3(0.0f, 1.0f, 0.0f);
+    glm::mat4 projView = glm::lookAt(projPos, projAt, projUp);
+    glm::mat4 projProj = glm::perspective(glm::radians(30.0f), 1.0f, 0.2f, 1000.0f);
+    glm::mat4 bias = glm::translate(glm::mat4(1.0f), vec3(0.5f));
+    bias = glm::scale(bias, vec3(0.5f));
+    prog.setUniform("ProjectorMatrix", bias * projProj * projView);
 
-    // Create and populate the buffer objects
-    GLuint vboHandles[2];
-    glGenBuffers(2, vboHandles);
-    GLuint positionBufferHandle = vboHandles[0];
-    GLuint colorBufferHandle = vboHandles[1];
+    view = glm::lookAt(vec3(-1.f, 6.f, 5.8f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
-    glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), positionData, GL_STATIC_DRAW);
+    timePrev = 0.f;
+    angle = 0.f;
 
-    glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colorData, GL_STATIC_DRAW);
+    //rotationMatrix = glm::rotate(glm::mat4(1.f), angle, vec3(0.f, 0.f, 0.f));
 
-    // Create and set-up the vertex array object
-    glGenVertexArrays( 1, &vaoHandle );
-    glBindVertexArray(vaoHandle);
+    /*
+    //Query location of RotationMatrix variable in GLSL
+    GLuint programHandle = prog.getHandle();
+    GLuint location = glGetUniformLocation(programHandle, "RotationMatrix");
 
-    glEnableVertexAttribArray(0);  // Vertex position
-    glEnableVertexAttribArray(1);  // Vertex color
+    //Assign values to RotationMatrix variable
+    glUniformMatrix4fv(location, 1, GL_FALSE, &rotationMatrix[0][0]);
+    */
 
-    #ifdef __APPLE__
-        glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
+    //prog.setUniform("RotationMatrix", rotationMatrix);
 
-        glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-        glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
-    #else
-    		glBindVertexBuffer(0, positionBufferHandle, 0, sizeof(GLfloat)*3);
-    		glBindVertexBuffer(1, colorBufferHandle, 0, sizeof(GLfloat)*3);
+    float x, z;
+    for (int i = 0; i < 3; i++)
+    {
+        std::stringstream name;
+        name << "lights[" << i << "].lightPosition";
+        x = 2.0f * cosf((glm::two_pi<float>() / 3) * i);
+        z = 2.0f * sinf((glm::two_pi<float>() / 3) * i);
+        prog.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z + 1.0f, 0.0f));
+    }
 
-    		glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
-    		glVertexAttribBinding(0, 0);
-    		glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 0);
-    	  glVertexAttribBinding(1, 1);
-    #endif
-    glBindVertexArray(0);
+    prog.setUniform("lights[0].lightAmbient", vec3(0.0f, 0.0f, 0.1f));
+    prog.setUniform("lights[1].lightAmbient", vec3(0.0f, 0.1f, 0.0f));
+    prog.setUniform("lights[2].lightAmbient", vec3(0.1f, 0.0f, 0.0f));
+
+    prog.setUniform("lights[0].lightDiffuse", vec3(0.0f, 0.0f, 0.9f));
+    prog.setUniform("lights[1].lightDiffuse", vec3(0.0f, 0.4f, 0.0f));
+    prog.setUniform("lights[2].lightDiffuse", vec3(0.4f, 0.0f, 0.0f));
+
+    prog.setUniform("lights[0].lightSpecular", vec3(0.0f, 0.0f, 0.2f));
+    prog.setUniform("lights[1].lightSpecular", vec3(0.0f, 0.2f, 0.0f));
+    prog.setUniform("lights[2].lightSpecular", vec3(0.2f, 0.0f, 0.0f));
+
+    /*prog.setUniform("lightPosition", view * glm::vec4(5.0f, 5.0f, 2.0f, 0.0f));
+    prog.setUniform("light.lightAmbient", 0.4f, 0.4f, 0.4f);
+    prog.setUniform("light.lightDiffuse", 1.0f, 1.0f, 1.0f);
+    prog.setUniform("light.lightSpecular", 1.0f, 1.0f, 1.0f);*/
+
+    prog.setUniform("material.materialAmbient", 0.1f, 0.1f, 0.1f);
+    prog.setUniform("material.materialDiffuse", 0.3f, 0.3f, 0.3f); //0.9
+    prog.setUniform("material.materialSpecular", 0.1f, 0.1f, 0.1f);
+    prog.setUniform("material.shinyness", 45.0f); //180
+
+    prog.setUniform("fog.MaxDistance", 20.f);
+    prog.setUniform("fog.MinDistance", 0.0f);
+    prog.setUniform("fog.Colour", 0.5f, 0.5f, 0.5f);
+
+    //Texturing
+    GLuint baseTexture = Texture::loadTexture("media/texture/brick1.jpg");
+    GLuint alphaTexture = Texture::loadTexture("media/texture/moss.png");
+    GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa-hdr/pisa");
+    GLuint flowerTexture = Texture::loadTexture("media/texture/flower.png");
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, baseTexture);
+
+    //GLuint alphaTexture = Texture::loadTexture("media/texture/moss.png");
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, alphaTexture);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, flowerTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 }
 
 void SceneBasic_Uniform::compile()
 {
-	try {
-		prog.compileShader("shader/basic_uniform.vert");
-		prog.compileShader("shader/basic_uniform.frag");
-		prog.link();
-		prog.use();
-	} catch (GLSLProgramException &e) {
-		cerr << e.what() << endl;
-		exit(EXIT_FAILURE);
-	}
+    try {
+        prog.compileShader("shader/basic_uniform.vert");
+        prog.compileShader("shader/basic_uniform.frag");
+        prog.link();
+        prog.use();
+    }
+    catch (GLSLProgramException& e) {
+        cerr << e.what() << endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
-void SceneBasic_Uniform::update( float t )
+void SceneBasic_Uniform::SetMatrices()
 {
-	//update your angle here
+    glm::mat4 mv = view * model;
+    prog.setUniform("ModelViewMatrix", mv);
+    prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    prog.setUniform("MVP", projection * mv);
+    prog.setUniform("ProjectionMatrix", projection);
+    prog.setUniform("ModelMatrix", model);
+    //prog.setUniform("RotationMatrix", rotationMatrix);
+
+    prog.setUniform("Fog.MaxDistance", 30.f);
+    prog.setUniform("Fog.MinDistance", 1.f);
+    prog.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
 }
 
+//Called by scenerunner.h
+void SceneBasic_Uniform::update(float t)
+{
+    float deltaTime = t - timePrev;
+
+    if (timePrev == 0.f)
+    {
+        deltaTime = 0.f;
+    }
+
+    timePrev = t;
+    angle += rotationSpeed * deltaTime;
+
+    if (angle > glm::two_pi<float>())
+    {
+        angle -= glm::two_pi<float>();
+    }
+}
+
+//Called by scenerunner.h
 void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    //create the rotation matrix here and update the uniform in the shader 
+    glClear(GL_DEPTH_BUFFER_BIT);
 
-    glBindVertexArray(vaoHandle);
-    glDrawArrays(GL_TRIANGLES, 0, 3 );
+    vec3 cameraPosition = vec3(7.f * cos(angle), 2.f, 7.f * sin(angle));
+    view = glm::lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
-    glBindVertexArray(0);
+    //Draw skybox
+    prog.use();
+    model = glm::mat4(1.f);
+
+    SetMatrices();
+
+    //float t = static_cast<float>(glfwGetTime());
+    //update(t);
+
+    //update light position
+    glm::vec4 lightPosition = glm::vec4(10.f * cos(angle), 10.f, 10.f * sin(angle), 1.f);
+
+    prog.setUniform("lights[0].lightPosition", view * lightPosition);
+
+    //teapot.render();
+    //skyBox.render();
+    grassPlane->render();
+    //cube.render();
+    //plane.render();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
 {
+    glViewport(0, 0, w, h);
     width = w;
     height = h;
-    glViewport(0,0,w,h);
+    projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
 }

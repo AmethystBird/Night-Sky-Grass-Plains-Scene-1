@@ -145,23 +145,44 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="helper\glslprogram.h" />
-    <ClInclude Include="helper\glutils.h" />
-    <ClInclude Include="helper\scene.h" />
-    <ClInclude Include="helper\scenerunner.h" />
-    <ClInclude Include="scenebasic_uniform.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="helper\cube.cpp" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
+    <ClCompile Include="helper\objmesh.cpp" />
     <ClCompile Include="helper\stb\stb_image.cpp" />
+    <ClCompile Include="helper\texture.cpp" />
+    <ClCompile Include="helper\trianglemesh.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="plane.cpp" />
     <ClCompile Include="scenebasic_uniform.cpp" />
+    <ClCompile Include="skybox.cpp" />
+    <ClCompile Include="teapot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="helper\cube.h" />
+    <ClInclude Include="helper\drawable.h" />
+    <ClInclude Include="helper\glslprogram.h" />
+    <ClInclude Include="helper\glutils.h" />
+    <ClInclude Include="helper\objmesh.h" />
+    <ClInclude Include="helper\scene.h" />
+    <ClInclude Include="helper\scenerunner.h" />
+    <ClInclude Include="helper\stb\stb_image.h" />
+    <ClInclude Include="helper\stb\stb_image_write.h" />
+    <ClInclude Include="helper\texture.h" />
+    <ClInclude Include="helper\trianglemesh.h" />
+    <ClInclude Include="plane.h" />
+    <ClInclude Include="scenebasic_uniform.h" />
+    <ClInclude Include="skybox.h" />
+    <ClInclude Include="teapot.h" />
+    <ClInclude Include="teapotdata.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="media\texture\brick1.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

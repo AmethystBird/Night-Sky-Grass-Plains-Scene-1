@@ -27,39 +27,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="scenebasic_uniform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="helper\glslprogram.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="helper\glutils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="helper\scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="helper\scenerunner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="helper\glslprogram.cpp">
-      <Filter>helper</Filter>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="helper\glutils.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="helper\stb\stb_image.cpp">
-      <Filter>helper\stb</Filter>
+    <ClCompile Include="helper\glslprogram.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="scenebasic_uniform.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="teapot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="scenebasic_uniform.cpp">
+    <ClCompile Include="helper\cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\trianglemesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\stb\stb_image.cpp">
+      <Filter>helper\stb</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="plane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\objmesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -70,5 +74,60 @@
     <None Include="shader\basic_uniform.vert">
       <Filter>shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="helper\scene.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\scenerunner.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\stb\stb_image_write.h">
+      <Filter>helper\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\glutils.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\glslprogram.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="scenebasic_uniform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teapot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="teapotdata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\trianglemesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\drawable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\stb\stb_image.h">
+      <Filter>helper\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\objmesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="media\texture\brick1.jpg">
+      <Filter>media</Filter>
+    </Image>
   </ItemGroup>
 </Project>
