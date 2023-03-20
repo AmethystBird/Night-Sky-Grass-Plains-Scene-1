@@ -125,9 +125,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="media\texture\brick1.jpg">
-      <Filter>media</Filter>
-    </Image>
-  </ItemGroup>
 </Project>

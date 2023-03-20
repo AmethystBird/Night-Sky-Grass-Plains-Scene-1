@@ -25,9 +25,9 @@ private:
     void compile();
 
     //Teapot teapot;
-    SkyBox skyBox;
-    Cube cube;
-    //Plane plane;
+    //SkyBox skyBox;
+    //Cube cube;
+    Plane plane;
     unique_ptr<ObjMesh> grassPlane;
 
     void SetMatrices();

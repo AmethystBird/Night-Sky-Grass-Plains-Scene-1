@@ -38,8 +38,10 @@ using glm::vec3;
 //SceneBasic_Uniform::SceneBasic_Uniform() : teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))), angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f) {}
 
 //SceneBasic_Uniform::SceneBasic_Uniform() : plane(50.f, 50.f, 1, 1), angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f)
-SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f) {
-    grassPlane = ObjMesh::load("media/grassPlane/scene.gltf", true);
+SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), plane(50.f, 50.f, 1, 1) {
+    //grassPlane = ObjMesh::load("media/grassPlane/scene.gltf", true);
+    grassPlane = ObjMesh::load("media/tests/source/Tree_of_LifeSub4.obj", true, false);
+    //grassPlane = ObjMesh::load("media/bs_ears.obj", true, false);
 }
 
 //SceneBasic_Uniform::SceneBasic_Uniform() : timePrev(0.f), teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))) {}
@@ -127,7 +129,11 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("fog.MinDistance", 0.0f);
     prog.setUniform("fog.Colour", 0.5f, 0.5f, 0.5f);
 
-    //Texturing
+    GLuint baseTexture = Texture::loadTexture("media/texture/ogre_diffuse.png");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, baseTexture);
+
+    /*//Texturing
     GLuint baseTexture = Texture::loadTexture("media/texture/brick1.jpg");
     GLuint alphaTexture = Texture::loadTexture("media/texture/moss.png");
     GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa-hdr/pisa");
@@ -146,7 +152,7 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, flowerTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);*/
 }
 
 void SceneBasic_Uniform::compile()
@@ -224,7 +230,7 @@ void SceneBasic_Uniform::render()
     //skyBox.render();
     grassPlane->render();
     //cube.render();
-    //plane.render();
+    plane.render();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
