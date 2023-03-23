@@ -50,6 +50,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), timePrev(0.0f), rotation
     
     //C:\Users\soutram\Github\COMP3015\Coursework1\3015-CW1\media\tree\source
     tree = ObjMesh::load("media/tree/source/JASMIM+MANGA.obj", true, false);
+    torch = ObjMesh::load("media/torch/source/torch.obj", true, false);
 }
 
 //SceneBasic_Uniform::SceneBasic_Uniform() : timePrev(0.f), teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))) {}
@@ -111,17 +112,17 @@ void SceneBasic_Uniform::initScene()
         prog.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z + 1.0f, 0.0f));
     }
 
-    prog.setUniform("lights[0].lightAmbient", vec3(0.0f, 0.0f, 0.1f));
-    prog.setUniform("lights[1].lightAmbient", vec3(0.0f, 0.1f, 0.0f));
-    prog.setUniform("lights[2].lightAmbient", vec3(0.1f, 0.0f, 0.0f));
+    prog.setUniform("lights[0].lightAmbient", vec3(1.0f, 0.0f, 0.0f));
+    prog.setUniform("lights[1].lightAmbient", vec3(1.0f, 0.0f, 0.0f));
+    prog.setUniform("lights[2].lightAmbient", vec3(1.0f, 0.0f, 0.0f));
 
-    prog.setUniform("lights[0].lightDiffuse", vec3(0.0f, 0.0f, 0.9f));
-    prog.setUniform("lights[1].lightDiffuse", vec3(0.0f, 0.4f, 0.0f));
-    prog.setUniform("lights[2].lightDiffuse", vec3(0.4f, 0.0f, 0.0f));
+    prog.setUniform("lights[0].lightDiffuse", vec3(0.0f, 1.0f, 0.0f));
+    prog.setUniform("lights[1].lightDiffuse", vec3(0.0f, 1.0f, 0.0f));
+    prog.setUniform("lights[2].lightDiffuse", vec3(0.0f, 1.0f, 0.0f));
 
-    prog.setUniform("lights[0].lightSpecular", vec3(0.0f, 0.0f, 0.2f));
-    prog.setUniform("lights[1].lightSpecular", vec3(0.0f, 0.2f, 0.0f));
-    prog.setUniform("lights[2].lightSpecular", vec3(0.2f, 0.0f, 0.0f));
+    prog.setUniform("lights[0].lightSpecular", vec3(0.0f, 0.0f, 1.0f));
+    prog.setUniform("lights[1].lightSpecular", vec3(0.0f, 0.0f, 1.0f));
+    prog.setUniform("lights[2].lightSpecular", vec3(0.0f, 0.0f, 1.0f));
 
     /*prog.setUniform("lightPosition", view * glm::vec4(5.0f, 5.0f, 2.0f, 0.0f));
     prog.setUniform("light.lightAmbient", 0.4f, 0.4f, 0.4f);
@@ -133,15 +134,19 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("material.materialSpecular", 0.1f, 0.1f, 0.1f);
     prog.setUniform("material.shinyness", 45.0f); //180
 
-    prog.setUniform("fog.MaxDistance", 100.f);
-    prog.setUniform("fog.MinDistance", 50.0f);
+    prog.setUniform("fog.MaxDistance", 200.f);
+    prog.setUniform("fog.MinDistance", 100.0f);
     prog.setUniform("fog.Colour", 0.0f, 0.0f, 0.25f);
 
     GLuint baseTexture = Texture::loadTexture("media/tree/textures/_Vegetation_Bark_Maple_1.jpeg");
-    //GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa-hdr/pisa");
-    //GLuint skyBoxTexture = Texture::loadCubeMap("media/texture/cube/pisa");
+    GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa-hdr/pisa");
+    //GLuint skyBoxTexture = Texture::loadCubeMap("media/texture/cube/pisa", ".png");
+    //GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, baseTexture);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture);
 
     /*//Texturing
     GLuint baseTexture = Texture::loadTexture("media/texture/brick1.jpg");
@@ -219,8 +224,11 @@ void SceneBasic_Uniform::render()
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    vec3 cameraPosition = vec3(7.f * cos(angle), 2.f, 7.f * sin(angle));
-    view = glm::lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    //vec3 cameraPosition = vec3(7.f * cos(angle), 2.f, 7.f * sin(angle));
+    //view = glm::lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     //Draw skybox
     prog.use();
@@ -231,12 +239,11 @@ void SceneBasic_Uniform::render()
 
     //update light position
     glm::vec4 lightPosition = glm::vec4(10.f * cos(angle), 10.f, 10.f * sin(angle), 1.f);
-
     prog.setUniform("lights[0].lightPosition", view * lightPosition);
 
     SetMatrices();
     //teapot.render();
-    //skyBox.render();
+    skyBox.render();
     //cube.render();
     plane.render();
 
@@ -253,6 +260,23 @@ void SceneBasic_Uniform::render()
     SetMatrices();
 
     tree->render();
+
+    scale = glm::vec3(7.5f, 7.5f, 7.5f);
+    model = glm::scale(model, scale);
+
+    view = glm::translate(view, glm::vec3(0.f, -1.7f, 2.f));
+
+    SetMatrices();
+
+    //work on this to get light into position of torch flame
+    //glm::vec4 lightPosition = glm::vec4(10.f * cos(angle), 10.f, 10.f * sin(angle), 1.f);
+    //prog.setUniform("lights[0].lightPosition", view * lightPosition);
+
+    torch->render();
+
+    vec3 cameraPosition = vec3(7.f * cos(angle), 2.f, 7.f * sin(angle));
+    view = glm::lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    SetMatrices();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)

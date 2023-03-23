@@ -29,6 +29,7 @@ private:
     //Cube cube;
     Plane plane;
     unique_ptr<ObjMesh> tree;
+    unique_ptr<ObjMesh> torch;
 
     void SetMatrices();
 

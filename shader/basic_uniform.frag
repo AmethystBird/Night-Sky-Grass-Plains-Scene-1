@@ -10,7 +10,7 @@ layout (location = 0) out vec4 FragColor;
 layout (binding = 0) uniform sampler2D baseTexture;
 layout (binding = 1) uniform sampler2D alphaTexture;
 layout (binding = 2) uniform samplerCube skyBoxTexture;
-layout (binding = 3) uniform sampler2D projectedTexture;
+//layout (binding = 3) uniform sampler2D projectedTexture;
 
 uniform struct lightInfo
 {
@@ -83,11 +83,12 @@ void main() {
 	//vec4 alphaMap = texture(alphaTexture, textureCoordinates);
 	vec3 skyBoxTextureColour = texture(skyBoxTexture, normalize(vertexPositionFrag)).rgb;
 
-	vec3 projectedTextureColour = vec3(0.0);
+	//Temporarily removed
+	/*vec3 projectedTextureColour = vec3(0.0);
 	if (projectedTextureCoordinates.z > 0.0) //if value is positive, means in view of projector, so render
 	{
 		projectedTextureColour = textureProj(projectedTexture, projectedTextureCoordinates).rgb;
-	}
+	}*/
 
 	vec3 colour = vec3(0.0); //create colour directly in fragment shader since not passed by vertex shader anymore
 
@@ -97,6 +98,6 @@ void main() {
 		}
 
 		vec4 fogColour = Fog();
-		FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0) + vec4(colour + projectedTextureColour + 0.5, 1);
+		FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0);// + vec4(colour + projectedTextureColour + 0.5, 1);
 		//FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0);
 }
