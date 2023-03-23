@@ -30,6 +30,11 @@ using glm::vec3;
 //lab 4
 #include "helper/texture.h"
 
+//Camera
+glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 //SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 30.f, 30.f) {}
 //SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 10.f, 100.f) {} //view with cell shading
 
@@ -40,8 +45,11 @@ using glm::vec3;
 //SceneBasic_Uniform::SceneBasic_Uniform() : plane(50.f, 50.f, 1, 1), angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f)
 SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), plane(50.f, 50.f, 1, 1) {
     //grassPlane = ObjMesh::load("media/grassPlane/scene.gltf", true);
-    grassPlane = ObjMesh::load("media/tests/source/Tree_of_LifeSub4.obj", true, false);
+    //grassPlane = ObjMesh::load("media/TOL/source/Tree_of_LifeSub4.obj", true, false); //works
     //grassPlane = ObjMesh::load("media/bs_ears.obj", true, false);
+    
+    //C:\Users\soutram\Github\COMP3015\Coursework1\3015-CW1\media\tree\source
+    tree = ObjMesh::load("media/tree/source/JASMIM+MANGA.obj", true, false);
 }
 
 //SceneBasic_Uniform::SceneBasic_Uniform() : timePrev(0.f), teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))) {}
@@ -75,7 +83,7 @@ void SceneBasic_Uniform::initScene()
     bias = glm::scale(bias, vec3(0.5f));
     prog.setUniform("ProjectorMatrix", bias * projProj * projView);
 
-    view = glm::lookAt(vec3(-1.f, 6.f, 5.8f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //vec3(-1.f, 6.f, 5.8f), vec3(0.0f, 1.0f, 0.0f)
 
     timePrev = 0.f;
     angle = 0.f;
@@ -125,11 +133,13 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("material.materialSpecular", 0.1f, 0.1f, 0.1f);
     prog.setUniform("material.shinyness", 45.0f); //180
 
-    prog.setUniform("fog.MaxDistance", 20.f);
-    prog.setUniform("fog.MinDistance", 0.0f);
-    prog.setUniform("fog.Colour", 0.5f, 0.5f, 0.5f);
+    prog.setUniform("fog.MaxDistance", 100.f);
+    prog.setUniform("fog.MinDistance", 50.0f);
+    prog.setUniform("fog.Colour", 0.0f, 0.0f, 0.25f);
 
-    GLuint baseTexture = Texture::loadTexture("media/texture/ogre_diffuse.png");
+    GLuint baseTexture = Texture::loadTexture("media/tree/textures/_Vegetation_Bark_Maple_1.jpeg");
+    //GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa-hdr/pisa");
+    //GLuint skyBoxTexture = Texture::loadCubeMap("media/texture/cube/pisa");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, baseTexture);
 
@@ -216,8 +226,6 @@ void SceneBasic_Uniform::render()
     prog.use();
     model = glm::mat4(1.f);
 
-    SetMatrices();
-
     //float t = static_cast<float>(glfwGetTime());
     //update(t);
 
@@ -226,11 +234,25 @@ void SceneBasic_Uniform::render()
 
     prog.setUniform("lights[0].lightPosition", view * lightPosition);
 
+    SetMatrices();
     //teapot.render();
     //skyBox.render();
-    grassPlane->render();
     //cube.render();
     plane.render();
+
+    glm::vec3 scale = glm::vec3(0.025f, 0.025f, 0.025f);
+    model = glm::scale(model, scale);
+
+    view = glm::translate(view, glm::vec3(0.f, 3.f, 0.f));
+
+    /*glm::mat4 mvp = model * view * projection;
+    scale = glm::vec3(1.0f, -4.0f, 1.0f);
+    mvp = glm::scale(mvp, scale);
+    prog.setUniform("MVP", mvp);*/
+
+    SetMatrices();
+
+    tree->render();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
