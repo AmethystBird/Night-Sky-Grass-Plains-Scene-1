@@ -4,6 +4,10 @@ layout (location = 0) in vec3 VertexPosition;
 layout (location = 1) in vec3 VertexNormal;
 layout (location = 2) in vec2 VertexTexCoord;
 
+//texture differentiation
+//uniform int textureIndex;
+//flat out int textureIndexFrag;
+
 out vec4 position;
 out vec3 normal;
 out vec2 textureCoordinates;
@@ -36,6 +40,8 @@ void main()
 
 	projectedTextureCoordinates = ProjectorMatrix * (ModelMatrix * vec4(VertexPosition, 1.0));
 	//projectedTextureCoordinates = ProjectorMatrix * (ModelMatrix * position); //projected texture coordinates
+
+	//textureIndexFrag = textureIndex;
 
 	vertexPositionFrag = VertexPosition;
 	gl_Position = MVP * vec4(VertexPosition, 1.0);// * RotationMatrix; //multiply by rotation offset

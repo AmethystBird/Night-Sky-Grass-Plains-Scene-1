@@ -6,11 +6,17 @@ in vec2 textureCoordinates;
 in vec3 vertexPositionFrag;
 in vec4 projectedTextureCoordinates;
 
+//texture differentation
+//flat in int textureIndexFrag;
+
 layout (location = 0) out vec4 FragColor;
+
 layout (binding = 0) uniform sampler2D baseTexture;
-layout (binding = 1) uniform sampler2D alphaTexture;
+layout (binding = 1) uniform sampler2D overlayTexture;
+//layout (binding = 1) uniform sampler2D alphaTexture;
 layout (binding = 2) uniform samplerCube skyBoxTexture;
 //layout (binding = 3) uniform sampler2D projectedTexture;
+//layout (binding = 3) uniform sampler2D rockTexture;
 
 uniform struct lightInfo
 {
@@ -36,10 +42,49 @@ uniform struct FogInfo
 } fog;
 
 //Calculates ambient, diffuse & specular
+vec3 PhongMultiTexture(int lightIndex, vec3 cameraNormalization, vec4 cameraPosition)
+{
+	//Extraction of colour for each fragment
+	vec3 primaryTextureColour = texture(baseTexture, textureCoordinates).rgb;
+	vec3 secondaryTextureColour = texture(overlayTexture, textureCoordinates).rgb;
+
+	vec3 textureColour = mix(primaryTextureColour.rgb, secondaryTextureColour.rgb, 1.0);
+
+	vec3 ambient = lights[lightIndex].lightAmbient * material.materialAmbient * textureColour; //Ambience
+
+	//Diffusion
+	vec3 lightPosToVertexPosDirection = normalize(vec3(lights[lightIndex].lightPosition - (cameraPosition * lights[lightIndex].lightPosition)));
+	float sDotN = max(dot(lightPosToVertexPosDirection, cameraNormalization), 0.0);
+	vec3 diffuse = lights[lightIndex].lightDiffuse * material.materialDiffuse * sDotN * textureColour;
+
+	vec3 specular = vec3(0.0); //Specular
+
+	//If dot product is above 0, reflection can take place
+	if (sDotN > 0.0)
+	{
+		vec3 v = normalize(-cameraPosition.xyz);
+		vec3 reflection = reflect(-lightPosToVertexPosDirection, cameraNormalization);
+		specular = lights[lightIndex].lightSpecular * material.materialSpecular * pow(max(dot(reflection, v), 0.0), material.shinyness);
+	}
+
+	return ambient + diffuse + specular; //Composition of all light components
+}
+
+//Calculates ambient, diffuse & specular
 vec3 Phong(int lightIndex, vec3 cameraNormalization, vec4 cameraPosition)
 {
 	//Extraction of colour for each fragment
 	vec3 textureColour = texture(baseTexture, textureCoordinates).rgb;
+
+	/*vec3 textureColour = vec3(0.0);
+	if (textureIndexFrag == 0)
+	{
+		textureColour = texture(baseTexture, textureCoordinates).rgb;
+	}
+	else if (textureIndexFrag == 1)
+	{
+		textureColour = texture(rockTexture, textureCoordinates).rgb;
+	}*/
 
 	vec3 ambient = lights[lightIndex].lightAmbient * material.materialAmbient * textureColour; //Ambience
 
@@ -92,12 +137,27 @@ void main() {
 
 	vec3 colour = vec3(0.0); //create colour directly in fragment shader since not passed by vertex shader anymore
 
+	for (int i = 0; i < 3; i++)
+	{
+		colour += PhongMultiTexture(i, normal, position);
+	}
+
+	/*if (textureIndexFrag == 0)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			colour += PhongMultiTexture(i, normal, position);
+		}
+	}
+	else if (textureIndexFrag == 1)
+	{
 		for (int i = 0; i < 3; i++)
 		{
 			colour += Phong(i, normal, position);
 		}
+	}*/
 
-		vec4 fogColour = Fog();
-		FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0);// + vec4(colour + projectedTextureColour + 0.5, 1);
-		//FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0);
+	vec4 fogColour = Fog();
+	FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0);// + vec4(colour + projectedTextureColour + 0.5, 1);
+	//FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0);
 }
