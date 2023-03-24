@@ -8,6 +8,14 @@ layout (location = 2) in vec2 VertexTexCoord;
 //uniform int textureIndex;
 //flat out int textureIndexFrag;
 
+//Vertex lighting
+uniform vec4 VertexLightPosition;
+uniform vec3 Kd;
+uniform vec3 Ld;
+
+out vec3 LightIntensity;
+//  ^^
+
 out vec4 position;
 out vec3 normal;
 out vec2 textureCoordinates;
@@ -37,6 +45,11 @@ void main()
 {
 	textureCoordinates = VertexTexCoord;
 	GetCameraSpaceValues(normal, position.xyz);
+
+	//Vertex lighting
+	vec3 lightPosToVertexPosDirection = normalize(vec3(VertexLightPosition - position));
+	LightIntensity = Kd * Ld * max (dot(lightPosToVertexPosDirection, normal), 0.0);
+	//====
 
 	projectedTextureCoordinates = ProjectorMatrix * (ModelMatrix * vec4(VertexPosition, 1.0));
 	//projectedTextureCoordinates = ProjectorMatrix * (ModelMatrix * position); //projected texture coordinates

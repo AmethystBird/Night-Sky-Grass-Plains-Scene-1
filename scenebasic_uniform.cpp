@@ -30,11 +30,6 @@ using glm::vec3;
 //lab 4
 #include "helper/texture.h"
 
-//Camera
-glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
 //SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 30.f, 30.f) {}
 //SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 10.f, 100.f) {} //view with cell shading
 
@@ -85,6 +80,10 @@ void SceneBasic_Uniform::initScene()
     bias = glm::scale(bias, vec3(0.5f));
     prog.setUniform("ProjectorMatrix", bias * projProj * projView);
 
+    glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
     view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //vec3(-1.f, 6.f, 5.8f), vec3(0.0f, 1.0f, 0.0f)
 
     timePrev = 0.f;
@@ -105,6 +104,10 @@ void SceneBasic_Uniform::initScene()
 
     //prog.setUniform("textureIndex", 0);
 
+    prog.setUniform("VertexLightPosition", view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));
+    prog.setUniform("Kd", 0.25f, 0.0f, 0.0f);
+    prog.setUniform("Ld", 0.25f, 0.f, 0.f);
+
     float x, z;
     for (int i = 0; i < 3; i++)
     {
@@ -115,7 +118,7 @@ void SceneBasic_Uniform::initScene()
         prog.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z + 1.0f, 0.0f));
     }
 
-    prog.setUniform("lights[0].lightAmbient", vec3(5.0f, 5.0f, 5.0f)); //set these to 0
+    prog.setUniform("lights[0].lightAmbient", vec3(0.0f, 0.0f, 0.0f)); //set these to 0
     prog.setUniform("lights[0].lightDiffuse", vec3(1.0f, 1.0f, 1.0f));
     prog.setUniform("lights[0].lightSpecular", vec3(0.5f, 0.5f, 0.5f));
 
@@ -141,11 +144,6 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("fog.MinDistance", 0.f);
     prog.setUniform("fog.Colour", 0.0f, 0.25f, 0.5f);
 
-    prog.setUniform("Spot.L", vec3(0.9f));
-    prog.setUniform("Spot.La", vec3(0.5f));
-    prog.setUniform("Spot.Exponent", 50.0f);
-    prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
-
     //GLuint planeTexture = Texture::loadHdrCubeMap("media/grassPlane/textures/Material_baseColor.png");
     //GLuint skyBoxTexture = Texture::loadCubeMap("media/texture/cube/pisa", ".png");
     //GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa");
@@ -162,9 +160,16 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture);
 
-    GLuint rockTexture = Texture::loadTexture("media/texture/brick.jpg");
+    GLuint mapleLeaves = Texture::loadTexture("media/mapleLeaves/mapleLeaves.png");
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, rockTexture);
+    glBindTexture(GL_TEXTURE_2D, mapleLeaves);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    //Rock texture; still can't be loaded separately
+    /*GLuint rockTexture = Texture::loadTexture("media/texture/brick.jpg");
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, rockTexture);*/
 
     /*//Texturing
     GLuint baseTexture = Texture::loadTexture("media/texture/brick1.jpg");
@@ -268,7 +273,7 @@ void SceneBasic_Uniform::render()
 
     if (fogIncreasing == true)
     {
-        if (fogIntensity < 128.f)
+        if (fogIntensity < 192.f)
         {
             fogIntensity = fogIntensity + fogChangeSpeed;
         }
@@ -300,7 +305,7 @@ void SceneBasic_Uniform::render()
     glm::vec3 scale = glm::vec3(0.025f, 0.025f, 0.025f);
     model = glm::scale(model, scale);
 
-    view = glm::translate(view, glm::vec3(0.f, 3.f, 0.f));
+    view = glm::translate(view, glm::vec3(0.f, 3.f, -2.f));
 
     /*glm::mat4 mvp = model * view * projection;
     scale = glm::vec3(1.0f, -4.0f, 1.0f);
@@ -315,7 +320,7 @@ void SceneBasic_Uniform::render()
     scale = glm::vec3(72.f, 72.f, 72.f);
     model = glm::scale(model, scale);
 
-    view = glm::translate(view, glm::vec3(0.f, -1.7f, 2.f));
+    view = glm::translate(view, glm::vec3(3.f, -2.7f, 2.f));
 
     SetMatrices();
 
