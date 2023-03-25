@@ -3,9 +3,9 @@
 ### Development Hardware
  - IDE: Visual Studio 2022
  - OS: Windows 11
-### Overview "How does it work?"
+### Overview
 The Night Sky Grass Plains OpenGL & GLSL Scene program contains a scene which can be described by the project's title. While being viewed, the camera will rotate around the scene in order to give the user a better view of the entire scene. The scene also contains fog, which will dynamically change in depth.
-### Architecture "How does your code fit together ..."
+### Architecture
 #### Overview
 This program contains 3rd party code written specifically for the related module by the organisation running it. That is, the project template base project. Expectable libraries are also present in this program. None of the aforementioned code is directly discussed; only that which has been written by the author of this program is discussed.
 #### Scenebasic Uniform Header & CPP Files
