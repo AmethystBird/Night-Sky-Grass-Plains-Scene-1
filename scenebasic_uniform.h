@@ -6,8 +6,6 @@
 #include <glad/glad.h>
 #include "helper/glslprogram.h"
 
-#include "torus.h"
-#include "teapot.h"
 #include "helper/cube.h"
 #include "plane.h"
 #include "skybox.h"

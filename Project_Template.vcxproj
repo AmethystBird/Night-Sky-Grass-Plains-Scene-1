@@ -83,8 +83,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Dependencies\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Dependencies\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Public\OpenGL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Public\OpenGL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -157,7 +157,6 @@
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="scenebasic_uniform.cpp" />
     <ClCompile Include="skybox.cpp" />
-    <ClCompile Include="teapot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag" />
@@ -178,8 +177,6 @@
     <ClInclude Include="plane.h" />
     <ClInclude Include="scenebasic_uniform.h" />
     <ClInclude Include="skybox.h" />
-    <ClInclude Include="teapot.h" />
-    <ClInclude Include="teapotdata.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

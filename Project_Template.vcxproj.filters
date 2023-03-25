@@ -42,9 +42,6 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="teapot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="helper\cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -92,12 +89,6 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="scenebasic_uniform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="teapot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="teapotdata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="helper\cube.h">
