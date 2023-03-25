@@ -12,9 +12,7 @@ layout (location = 2) in vec2 VertexTexCoord;
 uniform vec4 VertexLightPosition;
 uniform vec3 Kd;
 uniform vec3 Ld;
-
 out vec3 LightIntensity;
-//  ^^
 
 out vec4 position;
 out vec3 normal;
@@ -25,7 +23,6 @@ out vec4 projectedTextureCoordinates;
 uniform mat4 ModelViewMatrix;
 uniform mat3 NormalMatrix;
 uniform mat4 ProjectionMatrix;
-//uniform mat4 RotationMatrix;
 
 //For projected texture
 uniform mat4 ProjectorMatrix;
@@ -49,10 +46,9 @@ void main()
 	//Vertex lighting
 	vec3 lightPosToVertexPosDirection = normalize(vec3(VertexLightPosition - position));
 	LightIntensity = Kd * Ld * max (dot(lightPosToVertexPosDirection, normal), 0.0);
-	//====
 
+	//Projected texture
 	projectedTextureCoordinates = ProjectorMatrix * (ModelMatrix * vec4(VertexPosition, 1.0));
-	//projectedTextureCoordinates = ProjectorMatrix * (ModelMatrix * position); //projected texture coordinates
 
 	//textureIndexFrag = textureIndex;
 

@@ -8,7 +8,6 @@ in vec4 projectedTextureCoordinates;
 
 //Vertex lighting
 in vec3 LightIntensity;
-//  ^^
 
 //texture differentation
 //flat in int textureIndexFrag;
@@ -125,7 +124,6 @@ vec4 Fog()
 
 	vec3 colour = mix(fog.Colour, shadeColour, fogFactor);
 	return vec4(colour, 1.0);
-	//FragColor = vec4(colour, 1.0);
 }
 
 void main() {
@@ -163,6 +161,4 @@ void main() {
 
 	vec4 fogColour = Fog();
 	FragColor = fogColour + vec4(skyBoxTextureColour, 1.0) + vec4(LightIntensity, 1.0) + vec4(colour + projectedTextureColour, 1);
-	//FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0) + vec4(LightIntensity, 1.0) + vec4(colour + projectedTextureColour + 0.5, 1);
-	//FragColor = vec4(colour, 1.0) + fogColour + vec4(skyBoxTextureColour, 1.0);
 }

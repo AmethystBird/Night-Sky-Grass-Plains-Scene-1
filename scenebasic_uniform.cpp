@@ -11,14 +11,10 @@ using std::cerr;
 using std::endl;
 
 #include "helper/glutils.h"
-
 #include "helper/glslprogram.h"
 
 #include <glm/ext/matrix_transform.hpp>
-
-//#include "torus.h"
 #include <glm/glm.hpp>
-
 #include <glm/ext/matrix_clip_space.hpp>
 
 using glm::vec3;
@@ -30,35 +26,11 @@ using glm::vec3;
 //lab 4
 #include "helper/texture.h"
 
-//SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 30.f, 30.f) {}
-//SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 10.f, 100.f) {} //view with cell shading
-
-//SceneBasic_Uniform::SceneBasic_Uniform() : teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))) {}
-
-//SceneBasic_Uniform::SceneBasic_Uniform() : teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))), angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f) {}
-
-//SceneBasic_Uniform::SceneBasic_Uniform() : plane(50.f, 50.f, 1, 1), angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), skyBox(100.0f)
 SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), timePrev(0.0f), rotationSpeed(glm::pi<float>() / 8.0f), plane(50.f, 50.f, 1, 1), skyBox(100.f) {
-    //grassPlane = ObjMesh::load("media/grassPlane/scene.gltf", true);
-    //grassPlane = ObjMesh::load("media/TOL/source/Tree_of_LifeSub4.obj", true, false); //works
-    //grassPlane = ObjMesh::load("media/bs_ears.obj", true, false);
-    
-    //C:\Users\soutram\Github\COMP3015\Coursework1\3015-CW1\media\tree\source
+    //loading of models
     tree = ObjMesh::load("media/tree/source/JASMIM+MANGA.obj", true, false);
-    //torch = ObjMesh::load("media/torch/source/torch.obj", true, false);
     rock = ObjMesh::load("media/rock/rock.obj", true, false);
 }
-
-//SceneBasic_Uniform::SceneBasic_Uniform() : timePrev(0.f), teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f))) {}
-
-//SceneBasic_Uniform::SceneBasic_Uniform() : timePrev(0.f), plane(50.f, 50.f, 1, 1) {}
-
-/*SceneBasic_Uniform::SceneBasic_Uniform() : teapot(50.f, glm::translate(glm::mat4(1.0f), vec3(8.0f, 0.0f, 2.0f)))
-{
-    teapotMesh = ObjMesh::load("../Project_Template/media/pig_triangulated.obj", true);
-}*/
-
-//glm::mat4 rotationMatrix;
 
 void SceneBasic_Uniform::initScene()
 {
@@ -66,8 +38,10 @@ void SceneBasic_Uniform::initScene()
 
     glEnable(GL_DEPTH_TEST);
 
+    /*--------------------------------
+    Setting of MVP
+    --------------------------------*/
     model = glm::mat4(1.0f);
-    //model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
     projection = glm::mat4(1.0f);
 
     //projector matrix
@@ -84,30 +58,20 @@ void SceneBasic_Uniform::initScene()
     glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //vec3(-1.f, 6.f, 5.8f), vec3(0.0f, 1.0f, 0.0f)
+    view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
 
     timePrev = 0.f;
     angle = 0.f;
 
-    //rotationMatrix = glm::rotate(glm::mat4(1.f), angle, vec3(0.f, 0.f, 0.f));
-
-    /*
-    //Query location of RotationMatrix variable in GLSL
-    GLuint programHandle = prog.getHandle();
-    GLuint location = glGetUniformLocation(programHandle, "RotationMatrix");
-
-    //Assign values to RotationMatrix variable
-    glUniformMatrix4fv(location, 1, GL_FALSE, &rotationMatrix[0][0]);
-    */
-
-    //prog.setUniform("RotationMatrix", rotationMatrix);
-
-    //prog.setUniform("textureIndex", 0);
-
+    /*--------------------------------
+    Setting of uniforms
+    --------------------------------*/
+    //Vertex lighting positions
     prog.setUniform("VertexLightPosition", view * glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));
     prog.setUniform("Kd", 0.25f, 0.0f, 0.0f);
     prog.setUniform("Ld", 0.25f, 0.f, 0.f);
 
+    //Fragment lighting positions
     float x, z;
     for (int i = 0; i < 3; i++)
     {
@@ -118,7 +82,8 @@ void SceneBasic_Uniform::initScene()
         prog.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z + 1.0f, 0.0f));
     }
 
-    prog.setUniform("lights[0].lightAmbient", vec3(0.0f, 0.0f, 0.0f)); //set these to 0
+    //Fragment lighting colours & intensity
+    prog.setUniform("lights[0].lightAmbient", vec3(0.0f, 0.0f, 0.0f));
     prog.setUniform("lights[0].lightDiffuse", vec3(1.0f, 1.0f, 1.0f));
     prog.setUniform("lights[0].lightSpecular", vec3(0.5f, 0.5f, 0.5f));
 
@@ -130,24 +95,19 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("lights[2].lightDiffuse", vec3(0.0f, 0.0f, 0.f));
     prog.setUniform("lights[2].lightSpecular", vec3(0.0f, 0.0f, 0.0f));
 
-    /*prog.setUniform("lightPosition", view * glm::vec4(5.0f, 5.0f, 2.0f, 0.0f));
-    prog.setUniform("light.lightAmbient", 0.4f, 0.4f, 0.4f);
-    prog.setUniform("light.lightDiffuse", 1.0f, 1.0f, 1.0f);
-    prog.setUniform("light.lightSpecular", 1.0f, 1.0f, 1.0f);*/
-
     prog.setUniform("material.materialAmbient", 0.1f, 0.1f, 0.1f);
     prog.setUniform("material.materialDiffuse", 0.3f, 0.3f, 0.3f); //0.9
     prog.setUniform("material.materialSpecular", 0.1f, 0.1f, 0.1f);
     prog.setUniform("material.shinyness", 45.0f); //180
 
+    //Fog colours, intensity & depth
     prog.setUniform("fog.MaxDistance", 16.f);
     prog.setUniform("fog.MinDistance", 0.f);
     prog.setUniform("fog.Colour", 0.0f, 0.25f, 0.5f);
 
-    //GLuint planeTexture = Texture::loadHdrCubeMap("media/grassPlane/textures/Material_baseColor.png");
-    //GLuint skyBoxTexture = Texture::loadCubeMap("media/texture/cube/pisa", ".png");
-    //GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa");
-
+    /*--------------------------------
+    Texture loading & binding
+    --------------------------------*/
     GLuint baseTexture = Texture::loadTexture("media/tree/textures/_Vegetation_Bark_Maple_1.jpeg");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, baseTexture);
@@ -165,34 +125,9 @@ void SceneBasic_Uniform::initScene()
     glBindTexture(GL_TEXTURE_2D, mapleLeaves);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-    //Rock texture; still can't be loaded separately
-    /*GLuint rockTexture = Texture::loadTexture("media/texture/brick.jpg");
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, rockTexture);*/
-
-    /*//Texturing
-    GLuint baseTexture = Texture::loadTexture("media/texture/brick1.jpg");
-    GLuint alphaTexture = Texture::loadTexture("media/texture/moss.png");
-    GLuint skyBoxTexture = Texture::loadHdrCubeMap("media/texture/cube/pisa-hdr/pisa");
-    GLuint flowerTexture = Texture::loadTexture("media/texture/flower.png");
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, baseTexture);
-
-    //GLuint alphaTexture = Texture::loadTexture("media/texture/moss.png");
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, alphaTexture);
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxTexture);
-
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, flowerTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);*/
 }
 
+//Compilation of shaders
 void SceneBasic_Uniform::compile()
 {
     try {
@@ -209,17 +144,16 @@ void SceneBasic_Uniform::compile()
 
 void SceneBasic_Uniform::SetMatrices()
 {
+    //Setting of matrices & related fog information
     glm::mat4 mv = view * model;
     prog.setUniform("ModelViewMatrix", mv);
     prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
     prog.setUniform("MVP", projection * mv);
     prog.setUniform("ProjectionMatrix", projection);
     prog.setUniform("ModelMatrix", model);
-    //prog.setUniform("RotationMatrix", rotationMatrix);
-
-    /*prog.setUniform("Fog.MaxDistance", 30.f);
-    prog.setUniform("Fog.MinDistance", 1.f);
-    prog.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));*/
+    
+    //prog.setUniform("Fog.MinDistance", 1.f);
+    //prog.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
 }
 
 //Called by scenerunner.h
@@ -241,10 +175,6 @@ void SceneBasic_Uniform::update(float t)
     }
 }
 
-float fogIntensity = 16.f;
-float fogChangeSpeed = 1.f / 16.f;
-bool fogIncreasing = true;
-
 //Called by scenerunner.h
 void SceneBasic_Uniform::render()
 {
@@ -254,23 +184,20 @@ void SceneBasic_Uniform::render()
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    //vec3 cameraPosition = vec3(7.f * cos(angle), 2.f, 7.f * sin(angle));
-    //view = glm::lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-
     //Draw skybox
     prog.use();
     model = glm::mat4(1.f);
-
-    //float t = static_cast<float>(glfwGetTime());
-    //update(t);
 
     SetMatrices();
 
     //update light position; work on this to get light into position of torch flame
     //glm::vec4 lightPosition = glm::vec4(10.f * cos(angle), 10.f, 10.f * sin(angle), 1.f); //if camera not moving
+
+    //Dynamic light position
     glm::vec4 lightPosition = glm::vec4(10.f * cos(angle * 2), 10.f, 10.f * sin(angle * 2), 1.f); //if camera moving
     prog.setUniform("lights[0].lightPosition", view * lightPosition);
 
+    //Dynamic fog levels
     if (fogIncreasing == true)
     {
         if (fogIntensity < 192.f)
@@ -297,11 +224,13 @@ void SceneBasic_Uniform::render()
     }
     prog.setUniform("fog.MaxDistance", fogIntensity);
 
-    //teapot.render();
+    //Rendering of objects
     skyBox.render();
     plane.render();
+    //teapot.render();
     //cube.render();
 
+    //Scaling & repositioning for tree object render
     glm::vec3 scale = glm::vec3(0.025f, 0.025f, 0.025f);
     model = glm::scale(model, scale);
 
@@ -316,33 +245,24 @@ void SceneBasic_Uniform::render()
 
     tree->render();
 
-    //scale = glm::vec3(7.5f, 7.5f, 7.5f);
+    //Scaling & repositioning for rock object render
     scale = glm::vec3(72.f, 72.f, 72.f);
     model = glm::scale(model, scale);
 
     view = glm::translate(view, glm::vec3(3.f, -2.7f, 2.f));
 
     SetMatrices();
-
-    /*GLuint baseTexture = Texture::loadTexture("media/texture/brick.jpg");
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, baseTexture);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, baseTexture);*/
-
-    //prog.setUniform("rockMatrix", projection * view * model);
-
-    //prog.setUniform("textureIndex", 1);
     rock->render();
 
     //glm::vec4 lightPosition = glm::vec4(10.f * cos(angle), 10.f, 10.f * sin(angle), 1.f);
     //prog.setUniform("lights[0].lightPosition", view * lightPosition);
     //prog.setUniform("lights[0].lightPosition", view * glm::vec4(20.f, 20.f, 0.f, 1.f));
 
-    vec3 cameraPosition = vec3(7.f * cos(angle), 2.f, 7.f * sin(angle));
     //vec3 cameraPosition = vec3(7.f, 2.f, 7.f);
     //vec3 cameraPosition = vec3(7.f, 20.f, 7.f); //panned out
+
+    //Rotating camera position
+    vec3 cameraPosition = vec3(7.f * cos(angle), 2.f, 7.f * sin(angle));
     view = glm::lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
     SetMatrices();
 }

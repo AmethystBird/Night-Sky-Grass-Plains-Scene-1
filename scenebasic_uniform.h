@@ -18,25 +18,29 @@ using namespace std;
 class SceneBasic_Uniform : public Scene
 {
 private:
-    //GLuint vaoHandle;
     GLSLProgram prog;
-    //float angle;
 
+    //Functions
     void compile();
+    void SetMatrices();
 
-    //Teapot teapot;
+    //Objects
     SkyBox skyBox;
-    //Cube cube;
     Plane plane;
     unique_ptr<ObjMesh> tree;
     unique_ptr<ObjMesh> rock;
+    //Teapot teapot;
+    //Cube cube;
 
-    void SetMatrices();
-
+    //Dynamic general attributes
     float timePrev;
     float angle;
-
     float rotationSpeed;
+
+    //Dynamic fog attributes
+    float fogIntensity = 16.f;
+    float fogChangeSpeed = 1.f / 4.f;
+    bool fogIncreasing = true;
 
 public:
     SceneBasic_Uniform();
